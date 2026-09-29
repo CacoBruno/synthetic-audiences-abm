@@ -182,6 +182,79 @@ CONTEXTO FINANCEIRO E RELAÇÃO COM CRÉDITO
 """.strip()
 
 
+
+def balanced_limit_agents(
+    df_agents: pd.DataFrame,
+    limit: int | None,
+    *,
+    seed: int = 42,
+    profile_col: str = "perfil_credito",
+) -> pd.DataFrame:
+    """Return a deterministic, approximately balanced sample across credit profiles."""
+    if limit is None or limit >= len(df_agents):
+        return df_agents.copy()
+    if limit <= 0:
+        raise ValueError("limit deve ser maior que zero.")
+    if profile_col not in df_agents.columns:
+        return df_agents.sample(n=limit, random_state=seed).copy()
+
+    profiles = sorted(df_agents[profile_col].dropna().astype(str).unique())
+    if not profiles:
+        return df_agents.sample(n=limit, random_state=seed).copy()
+
+    base = limit // len(profiles)
+    remainder = limit % len(profiles)
+    selected = []
+
+    for i, profile in enumerate(profiles):
+        n = base + (1 if i < remainder else 0)
+        if n == 0:
+            continue
+        group = df_agents[df_agents[profile_col].astype(str) == profile]
+        if len(group) < n:
+            raise ValueError(
+                f"Perfil '{profile}' tem {len(group)} agentes, mas a amostra balanceada "
+                f"precisa de {n}."
+            )
+        selected.append(group.sample(n=n, random_state=seed + i))
+
+    out = pd.concat(selected, ignore_index=True)
+    return out.sample(frac=1.0, random_state=seed).reset_index(drop=True)
+
+
+def questionnaire_for_condition(
+    questionnaire: dict[str, Any],
+    theme: str,
+    condition: str,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Select only questionnaire items and qualitative prompts valid for a condition."""
+    theme_cfg = questionnaire["themes"][theme]
+
+    def applies(item: dict[str, Any]) -> bool:
+        conditions = item.get("conditions")
+        return not conditions or condition in conditions
+
+    common = [
+        item for item in questionnaire.get("common_items", [])
+        if applies(item)
+    ]
+    theme_items = [
+        item for item in theme_cfg.get("items", [])
+        if applies(item)
+    ]
+
+    qualitative_by_condition = theme_cfg.get("qualitative_by_condition", {})
+    qualitative = qualitative_by_condition.get(
+        condition,
+        theme_cfg.get("qualitative", {}),
+    )
+    if not qualitative:
+        raise ValueError(
+            f"Questionário sem bloco qualitativo para theme={theme}, condition={condition}."
+        )
+
+    return [*common, *theme_items], qualitative
+
 def build_response_schema(
     items: list[dict[str, Any]],
     qualitative: dict[str, Any],
