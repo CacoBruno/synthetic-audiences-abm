@@ -1,4 +1,5 @@
 import pandas as pd
+import pytest
 
 from synthetic_audiences.experiments.credit_narratives import (
     add_credit_profile_overlays,
@@ -126,3 +127,35 @@ def test_negative_items_are_reversed_only_in_favorable_score():
     assert by_item["POS"]["score_favorable"] == 6
     assert by_item["NEG"]["score_raw"] == 6
     assert by_item["NEG"]["score_favorable"] == 2
+
+
+def test_credit_profile_overlay_refuses_generic_fallback():
+    base = pd.DataFrame(
+        [
+            {
+                "id_persona": "agent_1",
+                "renda familiar mensal": "Mais de 20 salários mínimos",
+                "Persona": "Pessoa sintética de teste.",
+            }
+        ]
+    )
+    config = {
+        "profiles": [
+            {
+                "id": "endividado_baixa_renda",
+                "label": "Endividado de baixa renda",
+                "eligibility": {
+                    "all": [
+                        {
+                            "column": "renda familiar mensal",
+                            "in": ["Até 1 salário mínimo"],
+                        }
+                    ]
+                },
+                "overlay": {},
+            }
+        ]
+    }
+
+    with pytest.raises(ValueError, match="endividado_baixa_renda"):
+        add_credit_profile_overlays(base, config, n_per_profile=1, seed=42)
