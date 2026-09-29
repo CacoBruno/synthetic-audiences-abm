@@ -81,25 +81,27 @@ def compute_tables(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
         )
     )
 
-    overall_pivot = overall_summary.pivot_table(
+    # Primary message comparison: narrative alone vs. context + narrative.
+    # Both conditions use the same brand-evaluation item set.
+    message_resilience = overall_summary.pivot_table(
         index=["theme", "perfil_credito", "perfil_credito_label"],
         columns="condition",
         values="overall_favorable",
         aggfunc="mean",
     ).reset_index()
 
-    for column in ["context", "narrative", "context_plus_narrative"]:
-        if column not in overall_pivot.columns:
-            overall_pivot[column] = pd.NA
+    for column in ["narrative", "context_plus_narrative"]:
+        if column not in message_resilience.columns:
+            message_resilience[column] = pd.NA
 
-    overall_pivot["message_lift"] = (
-        overall_pivot["context_plus_narrative"] - overall_pivot["context"]
-    )
-    overall_pivot["fragility"] = (
-        overall_pivot["context_plus_narrative"] - overall_pivot["narrative"]
+    message_resilience["resilience"] = (
+        message_resilience["context_plus_narrative"]
+        - message_resilience["narrative"]
     )
 
-    construct_pivot = construct_summary.pivot_table(
+    # Construct-level comparison. context_delta is only populated when that
+    # construct is valid in both the context and context+narrative conditions.
+    construct_comparison = construct_summary.pivot_table(
         index=["theme", "perfil_credito", "perfil_credito_label", "construct"],
         columns="condition",
         values="mean_favorable",
@@ -107,15 +109,21 @@ def compute_tables(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
     ).reset_index()
 
     for column in ["context", "narrative", "context_plus_narrative"]:
-        if column not in construct_pivot.columns:
-            construct_pivot[column] = pd.NA
+        if column not in construct_comparison.columns:
+            construct_comparison[column] = pd.NA
 
-    construct_pivot["message_lift"] = (
-        construct_pivot["context_plus_narrative"] - construct_pivot["context"]
+    construct_comparison["resilience"] = (
+        construct_comparison["context_plus_narrative"]
+        - construct_comparison["narrative"]
     )
-    construct_pivot["fragility"] = (
-        construct_pivot["context_plus_narrative"] - construct_pivot["narrative"]
+    construct_comparison["context_delta"] = (
+        construct_comparison["context_plus_narrative"]
+        - construct_comparison["context"]
     )
+
+    context_diagnostics = construct_summary[
+        construct_summary["condition"] == "context"
+    ].copy()
 
     qualitative = df.drop_duplicates(
         subset=[
@@ -200,15 +208,16 @@ def compute_tables(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
         "item_summary": item_summary,
         "construct_summary": construct_summary,
         "overall_summary": overall_summary,
-        "message_lift": overall_pivot,
-        "construct_lift": construct_pivot,
+        "message_resilience": message_resilience,
+        "construct_comparison": construct_comparison,
+        "context_diagnostics": context_diagnostics,
         "interpretation_shares": interpretation_shares,
         "open_responses": open_responses,
     }
 
 
 def render_report(tables: dict[str, pd.DataFrame], is_mock: bool) -> str:
-    lift = tables["message_lift"].copy()
+    resilience = tables["message_resilience"].copy()
     shares = tables["interpretation_shares"].copy()
 
     lines = ["# Itaú — Teste de narrativas com audiências sintéticas", ""]
@@ -222,44 +231,51 @@ def render_report(tables: dict[str, pd.DataFrame], is_mock: bool) -> str:
     else:
         lines.extend(
             [
-                "Os resultados abaixo resumem a reação das sete audiências financeiras às três condições experimentais.",
+                "Os resultados resumem a reação das audiências financeiras às condições experimentais.",
                 "",
-                "- **Message Lift** = contexto + narrativa − contexto.",
-                "- **Fragility** = contexto + narrativa − narrativa isolada.",
-                "- Scores favoráveis estão em escala 1–7; itens de risco foram invertidos apenas para esta métrica agregada.",
+                "- **Context** é diagnóstico do problema e não deve ser interpretado como mensagem do Itaú.",
+                "- **Resiliência** = contexto + narrativa − narrativa isolada.",
+                "- Resiliência negativa indica perda de desempenho quando a controvérsia é conhecida; positiva indica manutenção ou ganho.",
+                "- Scores favoráveis estão em escala 1–7; itens de risco são invertidos apenas na métrica favorável.",
                 "",
             ]
         )
 
-    for theme in lift["theme"].dropna().unique():
+    for theme in resilience["theme"].dropna().unique():
         lines.append(f"## {theme}")
         lines.append("")
-        theme_lift = lift[lift["theme"] == theme].copy()
+
+        theme_resilience = resilience[resilience["theme"] == theme].copy()
         cols = [
             "perfil_credito_label",
-            "context",
             "narrative",
             "context_plus_narrative",
-            "message_lift",
-            "fragility",
+            "resilience",
         ]
-        rounded = theme_lift[cols].copy()
+        rounded = theme_resilience[cols].copy()
         numeric_cols = [c for c in cols if c != "perfil_credito_label"]
         rounded[numeric_cols] = (
             rounded[numeric_cols]
             .apply(pd.to_numeric, errors="coerce")
             .round(2)
         )
+        lines.append("### Desempenho da narrativa")
+        lines.append("")
         lines.append(rounded.to_markdown(index=False))
         lines.append("")
 
-        combined = shares[
-            (shares["theme"] == theme)
-            & (shares["condition"] == "context_plus_narrative")
-        ].copy()
-        if not combined.empty:
+        for condition, title in [
+            ("context", "Leitura predominante do contexto"),
+            ("context_plus_narrative", "Leitura predominante após contexto + narrativa"),
+        ]:
+            selected = shares[
+                (shares["theme"] == theme)
+                & (shares["condition"] == condition)
+            ].copy()
+            if selected.empty:
+                continue
             top = (
-                combined.sort_values(
+                selected.sort_values(
                     ["perfil_credito_label", "share"],
                     ascending=[True, False],
                 )
@@ -267,7 +283,7 @@ def render_report(tables: dict[str, pd.DataFrame], is_mock: bool) -> str:
                 .head(1)
             )
             top["share"] = (top["share"] * 100).round(1)
-            lines.append("### Interpretação predominante após contexto + narrativa")
+            lines.append(f"### {title}")
             lines.append("")
             lines.append(
                 top[
