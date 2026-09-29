@@ -12,7 +12,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from synthetic_audiences.experiments.credit_narratives import add_credit_profile_overlays
+from synthetic_audiences.experiments.credit_narratives import (\n    add_credit_profile_overlays,\n    eligible_agents,\n)
 
 
 HERE = Path(__file__).resolve().parent
@@ -58,6 +58,14 @@ def main() -> None:
         )
 
     base = read_csv_auto(source)
+
+    print("Colunas da base:")
+    print(base.columns.tolist())
+    print("Elegibilidade por perfil:")
+    for profile in profiles["profiles"]:
+        n_candidates = len(eligible_agents(base, profile))
+        print(f"- {profile['id']}: {n_candidates} candidatos")
+
     agents = add_credit_profile_overlays(
         base,
         profiles,
