@@ -15,6 +15,7 @@ FINANCIAL_CONTEXT_COLUMNS = [
     "perfil_credito",
     "perfil_credito_label",
     "perfil_credito_subtipo",
+    "perfil_profissional_experimental",
     "situacao_endividamento",
     "comprometimento_renda",
     "relacao_com_credito",
