@@ -83,7 +83,12 @@ def add_credit_profile_overlays(
     n_per_profile: int = 10,
     seed: int = 42,
 ) -> pd.DataFrame:
-    """Select base personas and add the seven Itaú credit-profile overlays."""
+    """Select eligible base personas and add the seven Itaú credit-profile overlays.
+
+    The function intentionally refuses generic fallback sampling. A financial
+    profile such as "aposentado com consignado" must be anchored in a compatible
+    base persona before the experimental overlay is applied.
+    """
     if n_per_profile <= 0:
         raise ValueError("n_per_profile deve ser maior que zero.")
 
@@ -93,16 +98,17 @@ def add_credit_profile_overlays(
     for profile_index, profile in enumerate(profile_defs):
         profile_id = profile["id"]
         candidates = eligible_agents(df_agents, profile)
-        fallback_used = False
 
         if len(candidates) < n_per_profile:
-            candidates = df_agents.copy()
-            fallback_used = True
+            raise ValueError(
+                f"Perfil '{profile_id}' tem apenas {len(candidates)} candidatos "
+                f"e precisa de {n_per_profile}. Aumente a população-base ou revise "
+                "os critérios de elegibilidade."
+            )
 
-        replace = len(candidates) < n_per_profile
         selected = candidates.sample(
             n=n_per_profile,
-            replace=replace,
+            replace=False,
             random_state=seed + profile_index,
         ).reset_index(drop=True)
 
@@ -124,7 +130,7 @@ def add_credit_profile_overlays(
             )
             record["perfil_credito"] = profile_id
             record["perfil_credito_label"] = profile["label"]
-            record["profile_selection_fallback"] = fallback_used
+            record["profile_selection_fallback"] = False
 
             overlay = dict(profile.get("overlay", {}))
             subtype = subtypes[i % len(subtypes)] if subtypes else None
