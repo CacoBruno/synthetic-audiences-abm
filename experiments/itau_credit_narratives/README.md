@@ -68,13 +68,23 @@ Na raiz do projeto:
 python experiments/itau_credit_narratives/build_agents.py
 ```
 
-Por padrão são 10 agentes por perfil, totalizando 70.
+Por padrão, o script gera primeiro uma população-base reproduzível de **5.000 personas individuais** usando `data/reference/reference_config.yml` e `seed=42`. Em seguida, seleciona somente personas elegíveis para cada perfil financeiro e aplica o overlay experimental.
+
+O padrão é 10 agentes por perfil, totalizando 70. Não existe fallback genérico: se algum perfil não tiver candidatos suficientes, o pipeline interrompe a execução.
 
 Para alterar:
 
 ```powershell
-python experiments/itau_credit_narratives/build_agents.py --n-per-profile 30
+python experiments/itau_credit_narratives/build_agents.py --n-per-profile 30 --base-population-size 10000
 ```
+
+Também é possível fornecer uma base própria de personas individuais:
+
+```powershell
+python experiments/itau_credit_narratives/build_agents.py --source caminho/agents.csv
+```
+
+O arquivo `cluster_perfil_persona.csv` permanece versionado no projeto como base de resultados agregados do pipeline anterior. Ele **não é usado para selecionar estes perfis financeiros**, porque não contém as variáveis individuais necessárias, como idade, renda e ocupação.
 
 Saída:
 
@@ -87,7 +97,7 @@ experiments/itau_credit_narratives/outputs/agents_itau_credit.csv
 Use primeiro:
 
 ```powershell
-python experiments/itau_credit_narratives/run_experiment.py --mock --limit-agents 7 --repeats 1
+python experiments/itau_credit_narratives/run_experiment.py --mock --repeats 1
 ```
 
 Isso valida schema, persistência e análise sem gastar API.
