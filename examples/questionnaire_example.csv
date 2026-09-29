@@ -1,0 +1,5 @@
+question_id,construct,question_text,response_type,options
+q01,Credibilidade,"Esta notícia parece confiável para você?",likert_1_5,
+q02,Relevância,"Esta notícia é relevante para sua vida cotidiana?",likert_1_5,
+q03,Compartilhamento,"Você compartilharia essa notícia com alguém próximo?",likert_1_5,
+q04,Fonte de confiança,"Qual fonte você tenderia a consultar primeiro para confirmar essa informação?",single_choice,"TV aberta; Portal de notícias; YouTube; WhatsApp; Jornal impresso/digital de referência"

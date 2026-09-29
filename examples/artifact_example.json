@@ -1,0 +1,9 @@
+{
+  "artifact_id": "news_001",
+  "artifact_type": "news_text",
+  "content": "O governo anunciou um novo programa de crédito para pequenos empreendedores, com juros reduzidos e prioridade para trabalhadores informais que desejam regularizar suas atividades. A proposta será implementada inicialmente em capitais e cidades médias.",
+  "metadata": {
+    "source": "exemplo interno",
+    "topic": "economia, governo, empreendedorismo"
+  }
+}

@@ -1,0 +1,192 @@
+project:
+  name: Synthetic Audiences ABM
+  version: 0.1.0
+  source_notes:
+    - Os pesos e cruzamentos iniciais foram derivados dos arquivos markdown do projeto.
+    - Esta é uma configuração MVP: ajuste pesos e tabelas conforme novas fontes de dados forem incorporadas.
+
+outputs:
+  default_profiles_csv: data/output/agents.csv
+  default_results_jsonl: data/output/responses.jsonl
+  default_summary_csv: data/output/summary.csv
+
+demographic_variables:
+  idade: ["16-24 anos", "25-34 anos", "35-49 anos", "50-64 anos", "65 anos ou mais"]
+  gênero: ["Feminino", "Masculino", "Outro / não binário", "Prefere não responder"]
+  escolaridade: ["Sem instrução", "Ensino fundamental incompleto", "Ensino fundamental completo", "Ensino médio incompleto", "Ensino médio completo", "Ensino técnico / profissionalizante", "Ensino superior incompleto", "Ensino superior completo", "Pós-graduação"]
+  situação ocupacional: ["Empregado com carteira assinada", "Empregado sem carteira assinada", "Funcionário público", "Autônomo / conta própria", "MEI", "Empregador / empresário", "Desempregado procurando trabalho", "Aposentado / pensionista", "Estudante", "Dona(o) de casa / trabalho doméstico não remunerado", "Sem ocupação no momento"]
+  estado civil: ["Solteiro(a)", "Casado(a)", "União estável", "Divorciado(a)", "Separado(a)", "Viúvo(a)"]
+  condição de moradia: ["Imóvel próprio quitado", "Imóvel próprio financiado", "Imóvel alugado", "Imóvel cedido por familiar ou terceiros", "Ocupação / moradia sem pagamento formal"]
+  tipo de moradia: ["Casa", "Apartamento", "Casa em condomínio", "Quarto / cômodo / pensão", "Cortiço / habitação coletiva", "Moradia rural", "Outro tipo de moradia"]
+  localização: ["Capital", "Região metropolitana", "Interior urbano", "Zona rural"]
+  renda familiar mensal: ["Até 1 salário mínimo", "Mais de 1 a 2 salários mínimos", "Mais de 2 a 3 salários mínimos", "Mais de 3 a 5 salários mínimos", "Mais de 5 a 10 salários mínimos", "Mais de 10 a 20 salários mínimos", "Mais de 20 salários mínimos"]
+  acesso à internet: ["Tem internet fixa em casa", "Usa principalmente internet móvel", "Usa internet fora de casa", "Não tem acesso regular à internet"]
+  tamanho do domicílio: ["1 pessoa", "2-3 pessoas", "4-5 pessoas", "6 pessoas ou mais"]
+  telefone: ["Apenas celular", "Celular e telefone fixo", "Apenas telefone fixo", "Não possui telefone"]
+  identificação política: ["Esquerda", "Centro-esquerda", "Centro", "Centro-direita", "Direita", "Não se identifica politicamente", "Prefere não responder"]
+  ideologia: ["Muito progressista", "Progressista", "Moderado(a)", "Conservador(a)", "Muito conservador(a)", "Prefere não responder"]
+  raça/cor: ["Branca", "Preta", "Parda", "Amarela", "Indígena", "Prefere não responder"]
+
+survey_variables:
+  geração: ["Geração Bossa Nova", "Geração Ordem e Progresso", "Geração Redemocratização", "Geração.Com"]
+  segmento_e_bolhas: ["Conservadores cristãos", "Dependentes do Estado / Classe D e E", "Agro", "Progressistas", "Militantes de esquerda", "Empresários", "Liberais sociais", "Empreendedores individuais", "Extrema direita"]
+  tipo_de_território: ["Capital", "Cidade grande", "Cidade média", "Cidade pequena"]
+  uf: ["SP", "MG", "RJ", "BA", "PR", "RS", "PE", "CE", "PA", "SC", "GO", "MA", "PB", "AM", "ES", "MT", "RN", "PI", "AL", "DF", "MS", "SE", "RO", "TO", "AC", "AP", "RR"]
+  tipo_de_fontes_de_informação:
+    - "Alta confiança histórica e institucional: jornais de referência"
+    - "Grandes marcas de TV e portais amplos"
+    - "Digitais especializados ou econômicos"
+    - "Opinativos / ideológicos / polarizados"
+
+base_distributions:
+  geração:
+    "Geração Bossa Nova": 0.20
+    "Geração Ordem e Progresso": 0.32
+    "Geração Redemocratização": 0.31
+    "Geração.Com": 0.17
+  gênero:
+    "Feminino": 0.515
+    "Masculino": 0.485
+  raça/cor:
+    "Parda": 0.453
+    "Branca": 0.435
+    "Preta": 0.102
+    "Indígena": 0.008
+    "Amarela": 0.004
+  renda_pc:
+    "Até 1/4 SM": 0.133
+    "Mais de 1/4 até 1/2 SM": 0.185
+    "Mais de 1/2 até 1 SM": 0.292
+    "Mais de 1 SM": 0.390
+  identificação política:
+    "Esquerda": 0.23
+    "Centro": 0.37
+    "Direita": 0.36
+    "Não se identifica politicamente": 0.04
+
+segment_distributions:
+  "Conservadores cristãos":
+    population: 0.27
+    gênero: {"Feminino": 0.55, "Masculino": 0.45}
+    raça/cor: {"Branca": 0.40, "Parda": 0.48, "Preta": 0.11, "Outra": 0.01}
+    renda_pc: {"Até 1/4 SM": 0.13, "Mais de 1/4 até 1/2 SM": 0.20, "Mais de 1/2 até 1 SM": 0.32, "Mais de 1 SM": 0.35}
+    geração: {"Geração Bossa Nova": 0.23, "Geração Ordem e Progresso": 0.34, "Geração Redemocratização": 0.28, "Geração.Com": 0.15}
+    território: {"Capital": 0.22, "Cidade grande": 0.08, "Cidade média": 0.28, "Cidade pequena": 0.42}
+    fontes: ["Grandes marcas de TV e portais amplos", "Opinativos / ideológicos / polarizados"]
+  "Dependentes do Estado / Classe D e E":
+    population: 0.23
+    gênero: {"Feminino": 0.55, "Masculino": 0.45}
+    raça/cor: {"Branca": 0.33, "Parda": 0.52, "Preta": 0.14, "Outra": 0.01}
+    renda_pc: {"Até 1/4 SM": 0.25, "Mais de 1/4 até 1/2 SM": 0.30, "Mais de 1/2 até 1 SM": 0.30, "Mais de 1 SM": 0.15}
+    geração: {"Geração Bossa Nova": 0.18, "Geração Ordem e Progresso": 0.31, "Geração Redemocratização": 0.32, "Geração.Com": 0.19}
+    território: {"Capital": 0.19, "Cidade grande": 0.06, "Cidade média": 0.24, "Cidade pequena": 0.51}
+    fontes: ["Grandes marcas de TV e portais amplos", "Opinativos / ideológicos / polarizados"]
+  "Agro":
+    population: 0.13
+    gênero: {"Feminino": 0.44, "Masculino": 0.56}
+    raça/cor: {"Branca": 0.46, "Parda": 0.46, "Preta": 0.07, "Outra": 0.01}
+    renda_pc: {"Até 1/4 SM": 0.09, "Mais de 1/4 até 1/2 SM": 0.15, "Mais de 1/2 até 1 SM": 0.30, "Mais de 1 SM": 0.46}
+    geração: {"Geração Bossa Nova": 0.25, "Geração Ordem e Progresso": 0.36, "Geração Redemocratização": 0.27, "Geração.Com": 0.12}
+    território: {"Capital": 0.08, "Cidade grande": 0.03, "Cidade média": 0.34, "Cidade pequena": 0.55}
+    fontes: ["Digitais especializados ou econômicos", "Grandes marcas de TV e portais amplos", "Opinativos / ideológicos / polarizados"]
+  "Progressistas":
+    population: 0.11
+    gênero: {"Feminino": 0.60, "Masculino": 0.40}
+    raça/cor: {"Branca": 0.48, "Parda": 0.39, "Preta": 0.12, "Outra": 0.01}
+    renda_pc: {"Até 1/4 SM": 0.07, "Mais de 1/4 até 1/2 SM": 0.12, "Mais de 1/2 até 1 SM": 0.28, "Mais de 1 SM": 0.53}
+    geração: {"Geração Bossa Nova": 0.10, "Geração Ordem e Progresso": 0.25, "Geração Redemocratização": 0.38, "Geração.Com": 0.27}
+    território: {"Capital": 0.39, "Cidade grande": 0.12, "Cidade média": 0.34, "Cidade pequena": 0.15}
+    fontes: ["Alta confiança histórica e institucional: jornais de referência", "Digitais especializados ou econômicos"]
+  "Militantes de esquerda":
+    population: 0.07
+    gênero: {"Feminino": 0.50, "Masculino": 0.50}
+    raça/cor: {"Branca": 0.45, "Parda": 0.42, "Preta": 0.12, "Outra": 0.01}
+    renda_pc: {"Até 1/4 SM": 0.08, "Mais de 1/4 até 1/2 SM": 0.15, "Mais de 1/2 até 1 SM": 0.27, "Mais de 1 SM": 0.50}
+    geração: {"Geração Bossa Nova": 0.22, "Geração Ordem e Progresso": 0.30, "Geração Redemocratização": 0.32, "Geração.Com": 0.16}
+    território: {"Capital": 0.31, "Cidade grande": 0.08, "Cidade média": 0.35, "Cidade pequena": 0.26}
+    fontes: ["Alta confiança histórica e institucional: jornais de referência", "Opinativos / ideológicos / polarizados"]
+  "Empresários":
+    population: 0.06
+    gênero: {"Feminino": 0.45, "Masculino": 0.55}
+    raça/cor: {"Branca": 0.65, "Parda": 0.30, "Preta": 0.04, "Outra": 0.01}
+    renda_pc: {"Até 1/4 SM": 0.02, "Mais de 1/4 até 1/2 SM": 0.04, "Mais de 1/2 até 1 SM": 0.14, "Mais de 1 SM": 0.80}
+    geração: {"Geração Bossa Nova": 0.30, "Geração Ordem e Progresso": 0.35, "Geração Redemocratização": 0.25, "Geração.Com": 0.10}
+    território: {"Capital": 0.28, "Cidade grande": 0.10, "Cidade média": 0.40, "Cidade pequena": 0.22}
+    fontes: ["Digitais especializados ou econômicos", "Alta confiança histórica e institucional: jornais de referência"]
+  "Liberais sociais":
+    population: 0.05
+    gênero: {"Feminino": 0.48, "Masculino": 0.52}
+    raça/cor: {"Branca": 0.55, "Parda": 0.36, "Preta": 0.08, "Outra": 0.01}
+    renda_pc: {"Até 1/4 SM": 0.05, "Mais de 1/4 até 1/2 SM": 0.10, "Mais de 1/2 até 1 SM": 0.25, "Mais de 1 SM": 0.60}
+    geração: {"Geração Bossa Nova": 0.15, "Geração Ordem e Progresso": 0.30, "Geração Redemocratização": 0.35, "Geração.Com": 0.20}
+    território: {"Capital": 0.36, "Cidade grande": 0.12, "Cidade média": 0.35, "Cidade pequena": 0.17}
+    fontes: ["Alta confiança histórica e institucional: jornais de referência", "Digitais especializados ou econômicos"]
+  "Empreendedores individuais":
+    population: 0.05
+    gênero: {"Feminino": 0.35, "Masculino": 0.65}
+    raça/cor: {"Branca": 0.38, "Parda": 0.50, "Preta": 0.11, "Outra": 0.01}
+    renda_pc: {"Até 1/4 SM": 0.15, "Mais de 1/4 até 1/2 SM": 0.23, "Mais de 1/2 até 1 SM": 0.35, "Mais de 1 SM": 0.27}
+    geração: {"Geração Bossa Nova": 0.10, "Geração Ordem e Progresso": 0.36, "Geração Redemocratização": 0.40, "Geração.Com": 0.14}
+    território: {"Capital": 0.25, "Cidade grande": 0.09, "Cidade média": 0.36, "Cidade pequena": 0.30}
+    fontes: ["Opinativos / ideológicos / polarizados", "Digitais especializados ou econômicos", "Grandes marcas de TV e portais amplos"]
+  "Extrema direita":
+    population: 0.03
+    gênero: {"Feminino": 0.42, "Masculino": 0.58}
+    raça/cor: {"Branca": 0.55, "Parda": 0.38, "Preta": 0.06, "Outra": 0.01}
+    renda_pc: {"Até 1/4 SM": 0.08, "Mais de 1/4 até 1/2 SM": 0.13, "Mais de 1/2 até 1 SM": 0.29, "Mais de 1 SM": 0.50}
+    geração: {"Geração Bossa Nova": 0.25, "Geração Ordem e Progresso": 0.35, "Geração Redemocratização": 0.27, "Geração.Com": 0.13}
+    território: {"Capital": 0.20, "Cidade grande": 0.07, "Cidade média": 0.36, "Cidade pequena": 0.37}
+    fontes: ["Opinativos / ideológicos / polarizados", "Digitais especializados ou econômicos"]
+
+uf_weights:
+  SP: 0.22
+  MG: 0.10
+  RJ: 0.08
+  BA: 0.07
+  PR: 0.06
+  RS: 0.05
+  PE: 0.045
+  CE: 0.04
+  PA: 0.04
+  SC: 0.035
+  GO: 0.035
+  MA: 0.035
+  PB: 0.025
+  AM: 0.02
+  ES: 0.02
+  MT: 0.018
+  RN: 0.018
+  PI: 0.016
+  AL: 0.016
+  DF: 0.015
+  MS: 0.014
+  SE: 0.012
+  RO: 0.010
+  TO: 0.008
+  AC: 0.004
+  AP: 0.004
+  RR: 0.003
+
+uf_overindex:
+  "Conservadores cristãos": [SP, MG, BA, PE, CE, PA, GO, MA, PB, AM, ES]
+  "Dependentes do Estado / Classe D e E": [BA, RJ, PE, CE, PA, MA, PB, AM, RN, PI, AL, SE]
+  "Agro": [MG, PR, RS, PA, SC, GO, ES, MT, MS, RO, TO]
+  "Progressistas": [SP, RJ, BA, PE, CE, DF]
+  "Militantes de esquerda": [MG, RJ, BA, RS, PE, CE, PB, DF]
+  "Empresários": [SP, MG, PR, RS, SC, GO, ES, MT]
+  "Liberais sociais": [SP, PR, SC, DF, RJ, MG, ES]
+  "Empreendedores individuais": [SP, RJ, BA, PE, CE, AM, MG]
+  "Extrema direita": [PR, RS, PA, SC, GO, MT, MS]
+
+values_dimensions:
+  Religiosidade: "Mede o quanto a fé organiza a vida moral e cotidiana. Considerar centralidade de Deus, prática religiosa e tolerância religiosa."
+  Família: "Captura família como núcleo de pertencimento, proteção e motivação, incluindo tensão entre família tradicional e novos arranjos."
+  Honestidade: "Considera cumprimento de regras, informalidade, jeitinho e julgamento moral contextual."
+  Meritocracia: "Expressa crença em esforço individual, merecimento da ajuda, pobreza e apoio/rejeição a políticas redistributivas."
+  Ideologia: "Usar identidade política, conservadorismo/progressismo, estatismo econômico e punitivismo."
+  Discriminação: "Mede reconhecimento de racismo, machismo, preconceitos e ações afirmativas."
+  Sexualidade: "Captura aceitação de diversidade sexual, tolerância privada versus expressão pública e normas de gênero."
+  Comportamento social: "Traduz sociabilidade cotidiana, hábitos de mídia, vida dentro/fora de casa e relação com segurança."
+  Identidade nacional: "Mede orgulho/vergonha do Brasil, povo brasileiro, natureza, cultura regional e complexo de vira-lata."
+  Insegurança: "Captura medo da violência, vulnerabilidade percebida e tradução política do medo."
+  Confiança: "Mede confiança interpessoal, família, vizinhos, desconhecidos, instituições e pessoas diferentes."
