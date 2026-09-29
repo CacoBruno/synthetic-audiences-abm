@@ -1,0 +1,154 @@
+profiles:
+  - id: endividado_baixa_renda
+    label: Endividado de baixa renda
+    eligibility:
+      all:
+        - column: renda familiar mensal
+          in:
+            - Até 1 salário mínimo
+            - Mais de 1 a 2 salários mínimos
+            - Mais de 2 a 3 salários mínimos
+    overlay:
+      situacao_endividamento: Tem dívidas ativas e dificuldade recorrente para fechar o mês.
+      comprometimento_renda: Alto; parcelas e contas reduzem fortemente a renda disponível.
+      relacao_com_credito: Usa crédito também para administrar imprevistos e despesas do cotidiano.
+      produto_credito_principal: Cartão de crédito, parcelamento e/ou crédito pessoal.
+      relacao_bancaria: Mantém relação funcional com bancos e busca condições que caibam no orçamento.
+      banco_digital_principal: Pode usar banco digital como conta complementar ou principal.
+      experiencia_inadimplencia: Já viveu atraso, renegociação ou risco concreto de inadimplência.
+      literacia_financeira: Baixa a média; entende custos básicos, mas pode ter dificuldade para comparar produtos complexos.
+      vulnerabilidade_financeira: Alta.
+
+  - id: classe_media_renda_comprometida
+    label: Classe média com renda comprometida
+    eligibility:
+      all:
+        - column: renda familiar mensal
+          in:
+            - Mais de 3 a 5 salários mínimos
+            - Mais de 5 a 10 salários mínimos
+        - column: idade
+          in:
+            - 25-34 anos
+            - 35-49 anos
+            - 50-64 anos
+    overlay:
+      situacao_endividamento: Mantém pagamentos em dia na maior parte do tempo, mas acumula parcelas e obrigações.
+      comprometimento_renda: Médio a alto; uma parcela relevante da renda já está comprometida.
+      relacao_com_credito: Usa crédito para consumo, emergências e realização de planos.
+      produto_credito_principal: Cartão, financiamento e crédito pessoal.
+      relacao_bancaria: Compara bancos, mas valoriza conveniência, limite e relacionamento.
+      banco_digital_principal: Pode dividir produtos entre banco tradicional e digital.
+      experiencia_inadimplencia: Pode ter atrasado pagamentos pontualmente, sem inadimplência estrutural.
+      literacia_financeira: Média.
+      vulnerabilidade_financeira: Média.
+
+  - id: aposentado_consignado
+    label: Aposentado com consignado
+    eligibility:
+      any:
+        - column: situação ocupacional
+          equals: Aposentado / pensionista
+        - column: idade
+          equals: 65 anos ou mais
+    overlay:
+      situacao_endividamento: Possui crédito consignado ativo ou considera esse produto parte normal de sua vida financeira.
+      comprometimento_renda: Parte da renda mensal já chega comprometida por desconto automático.
+      relacao_com_credito: Valoriza previsibilidade de parcela, segurança e clareza das condições.
+      produto_credito_principal: Crédito consignado.
+      relacao_bancaria: Tende a valorizar instituições conhecidas e atendimento confiável.
+      banco_digital_principal: Não necessariamente é a principal relação bancária.
+      experiencia_inadimplencia: Não é necessariamente inadimplente, mas tem pouca margem para erros em renda fixa.
+      literacia_financeira: Média, com maior familiaridade com produtos tradicionais.
+      vulnerabilidade_financeira: Média a alta, sobretudo diante de ofertas agressivas, fraudes ou excesso de consignado.
+
+  - id: jovem_primeiro_credito_digital
+    label: Jovem em primeiro crédito, cliente de banco digital
+    eligibility:
+      all:
+        - column: idade
+          in:
+            - 16-24 anos
+            - 25-34 anos
+    overlay:
+      situacao_endividamento: Está construindo histórico financeiro e tem pouca experiência acumulada com dívida.
+      comprometimento_renda: Baixo a médio, mas pode crescer rapidamente com parcelamento e limite disponível.
+      relacao_com_credito: Vê acesso simples e rápido como atributo importante.
+      produto_credito_principal: Primeiro cartão e limite de crédito em aplicativo.
+      relacao_bancaria: Relação predominantemente digital, orientada por aplicativo e experiência de uso.
+      banco_digital_principal: Sim; banco digital ou fintech é a referência cotidiana.
+      experiencia_inadimplencia: Pouca ou nenhuma experiência anterior, com risco de subestimar custo acumulado.
+      literacia_financeira: Baixa a média, apesar de alta familiaridade digital.
+      vulnerabilidade_financeira: Média.
+
+  - id: mei
+    label: MEI
+    eligibility:
+      any:
+        - column: situação ocupacional
+          equals: MEI
+        - column: segmento_e_bolhas
+          equals: Empreendedores individuais
+    overlay:
+      situacao_endividamento: Convive com renda variável e decisões financeiras do negócio e da família.
+      comprometimento_renda: Oscilante; depende de faturamento, sazonalidade e capital de giro.
+      relacao_com_credito: Crédito pode funcionar como capital de giro, proteção de caixa e financiamento de consumo.
+      produto_credito_principal: Cartão, capital de giro, crédito pessoal e antecipação.
+      relacao_bancaria: Valoriza rapidez, flexibilidade e entendimento do fluxo de caixa.
+      banco_digital_principal: Pode usar fintechs e bancos tradicionais em paralelo.
+      experiencia_inadimplencia: Risco maior em meses de faturamento fraco, mesmo sem comportamento recorrente de atraso.
+      literacia_financeira: Média, com conhecimento prático maior que conhecimento técnico.
+      vulnerabilidade_financeira: Média a alta por volatilidade de renda.
+
+  - id: formador_opiniao
+    label: Formador de opinião
+    eligibility:
+      all:
+        - column: escolaridade
+          in:
+            - Ensino superior incompleto
+            - Ensino superior completo
+            - Pós-graduação
+      any:
+        - column: tipo_de_fontes_de_informação
+          contains_any:
+            - especializados
+            - jornais de referência
+    overlay:
+      situacao_endividamento: Não é definida pelo perfil profissional; avalia o tema também pelo impacto coletivo.
+      comprometimento_renda: Não é o principal determinante de sua leitura da narrativa.
+      relacao_com_credito: Analisa concessão, custo, transparência, inclusão e incentivos do mercado.
+      produto_credito_principal: Diversos produtos; foco analítico no sistema de crédito.
+      relacao_bancaria: Conhece diferenças entre bancos tradicionais, digitais e fintechs.
+      banco_digital_principal: Não determinante.
+      experiencia_inadimplencia: Não determinante para a função experimental.
+      literacia_financeira: Alta.
+      vulnerabilidade_financeira: Baixa como dimensão pessoal; alta sensibilidade a vulnerabilidade de terceiros.
+    subtypes:
+      - id: jornalista_economico
+        overlay:
+          perfil_profissional_experimental: Jornalista econômico.
+          relacao_com_credito: Analisa o tema como jornalista econômico, buscando evidências, conflitos de interesse e consequências para consumidores.
+      - id: educador_financeiro
+        overlay:
+          perfil_profissional_experimental: Educador financeiro.
+          relacao_com_credito: Analisa o tema como educador financeiro, com foco em compreensão, uso responsável e proteção do consumidor.
+
+  - id: alta_renda
+    label: Cliente de alta renda
+    eligibility:
+      all:
+        - column: renda familiar mensal
+          in:
+            - Mais de 10 a 20 salários mínimos
+            - Mais de 20 salários mínimos
+    overlay:
+      situacao_endividamento: Tem maior capacidade de absorver parcelas e acessar alternativas financeiras.
+      comprometimento_renda: Baixo a médio em relação à renda disponível.
+      relacao_com_credito: Usa crédito por conveniência, planejamento, patrimônio ou oportunidade.
+      produto_credito_principal: Cartões premium, financiamento, crédito pessoal e produtos com garantia.
+      relacao_bancaria: Espera personalização, transparência, atendimento e condições competitivas.
+      banco_digital_principal: Pode distribuir relacionamento entre bancos e plataformas digitais.
+      experiencia_inadimplencia: Baixa probabilidade estrutural, embora possa rejeitar condições consideradas injustas.
+      literacia_financeira: Média a alta.
+      vulnerabilidade_financeira: Baixa.

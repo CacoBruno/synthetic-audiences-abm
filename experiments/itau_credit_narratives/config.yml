@@ -1,0 +1,13 @@
+experiment:
+  id: itau_credit_narratives_v1
+  description: Teste de narrativas de crédito do Itaú com audiências sintéticas.
+  model: gpt-6-luna
+  reasoning_effort: low
+  n_per_profile: 10
+  repeats: 2
+  max_workers: 8
+  seed: 42
+
+paths:
+  agents_source: cluster_perfil_persona.csv
+  outputs_dir: experiments/itau_credit_narratives/outputs

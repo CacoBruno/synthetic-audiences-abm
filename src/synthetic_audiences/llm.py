@@ -39,48 +39,105 @@ def extract_json(text: str) -> dict[str, Any]:
     return json.loads(match.group(0))
 
 
+def _supports_reasoning_effort(model: str) -> bool:
+    model = model.lower()
+    return model.startswith(("gpt-6", "gpt-5.6", "o1", "o3", "o4"))
+
+
 class OpenAIJsonClient:
-    """Small wrapper around the OpenAI SDK with a JSON fallback parser.
+    """OpenAI Responses API wrapper for JSON and JSON Schema outputs."""
 
-    The code first tries the Responses API and falls back to Chat Completions for
-    environments pinned to older SDK/API behavior.
-    """
-
-    def __init__(self, model: str | None = None, api_key: str | None = None, temperature: float = 0.2):
-        self.model = model or os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
+    def __init__(
+        self,
+        model: str | None = None,
+        api_key: str | None = None,
+        temperature: float = 0.2,
+        reasoning_effort: str | None = None,
+    ):
+        self.model = model or os.getenv("OPENAI_MODEL", "gpt-6-luna")
         self.temperature = temperature
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        env_effort = os.getenv("OPENAI_REASONING_EFFORT")
+        self.reasoning_effort = reasoning_effort or env_effort
+
+        if self.reasoning_effort is None and _supports_reasoning_effort(self.model):
+            self.reasoning_effort = "none"
+
         if not self.api_key:
             raise RuntimeError("OPENAI_API_KEY is not set. Use --mock or create a .env file.")
+
         from openai import OpenAI
 
         self.client = OpenAI(api_key=self.api_key)
 
-    def complete_json(self, messages: list[dict[str, str]]) -> dict[str, Any]:
-        # Preferred path: Responses API.
+    def _responses_request(
+        self,
+        messages: list[dict[str, str]],
+        *,
+        schema_name: str,
+        schema: dict[str, Any],
+        strict: bool = True,
+    ):
+        kwargs: dict[str, Any] = {
+            "model": self.model,
+            "input": messages,
+            "text": {
+                "format": {
+                    "type": "json_schema",
+                    "name": schema_name,
+                    "schema": schema,
+                    "strict": strict,
+                }
+            },
+        }
+
+        if self.reasoning_effort is not None and _supports_reasoning_effort(self.model):
+            kwargs["reasoning"] = {"effort": self.reasoning_effort}
+
+        if self.reasoning_effort in {None, "none"}:
+            kwargs["temperature"] = self.temperature
+
+        return self.client.responses.create(**kwargs)
+
+    def complete_json_schema(
+        self,
+        messages: list[dict[str, str]],
+        *,
+        schema_name: str,
+        schema: dict[str, Any],
+        strict: bool = True,
+    ) -> dict[str, Any]:
+        """Return JSON following a caller-provided JSON Schema."""
         try:
-            response = self.client.responses.create(
-                model=self.model,
-                input=messages,
-                temperature=self.temperature,
-                text={
-                    "format": {
-                        "type": "json_schema",
-                        "name": JSON_RESPONSE_SCHEMA["name"],
-                        "schema": JSON_RESPONSE_SCHEMA["schema"],
-                    }
-                },
+            response = self._responses_request(
+                messages,
+                schema_name=schema_name,
+                schema=schema,
+                strict=strict,
             )
             return extract_json(response.output_text)
         except Exception:
-            # Compatibility path: Chat Completions with JSON object mode.
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                temperature=self.temperature,
-                response_format={"type": "json_object"},
-            )
+            kwargs: dict[str, Any] = {
+                "model": self.model,
+                "messages": messages,
+                "response_format": {"type": "json_object"},
+            }
+            if _supports_reasoning_effort(self.model):
+                kwargs["reasoning_effort"] = "none"
+                kwargs["temperature"] = self.temperature
+            else:
+                kwargs["temperature"] = self.temperature
+
+            response = self.client.chat.completions.create(**kwargs)
             return extract_json(response.choices[0].message.content or "")
+
+    def complete_json(self, messages: list[dict[str, str]]) -> dict[str, Any]:
+        return self.complete_json_schema(
+            messages,
+            schema_name=JSON_RESPONSE_SCHEMA["name"],
+            schema=JSON_RESPONSE_SCHEMA["schema"],
+            strict=False,
+        )
 
 
 def mock_agent_response(
