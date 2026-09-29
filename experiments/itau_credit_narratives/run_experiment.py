@@ -19,9 +19,11 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from synthetic_audiences.experiments.credit_narratives import (
+    balanced_limit_agents,
     build_experiment_messages,
     build_response_schema,
     mock_experiment_response,
+    questionnaire_for_condition,
     response_to_long_rows,
 )
 from synthetic_audiences.llm import OpenAIJsonClient
@@ -45,12 +47,6 @@ def flatten_stimuli(stimuli_config: dict, themes: set[str] | None = None) -> lis
             row["theme"] = theme_id
             out.append(row)
     return out
-
-
-def questionnaire_for_theme(questionnaire: dict, theme: str) -> tuple[list[dict], dict]:
-    common = questionnaire.get("common_items", [])
-    theme_cfg = questionnaire["themes"][theme]
-    return [*common, *theme_cfg["items"]], theme_cfg["qualitative"]
 
 
 def coerce_response(
@@ -115,8 +111,11 @@ def main() -> None:
         )
 
     agents = pd.read_csv(agents_path)
-    if args.limit_agents:
-        agents = agents.head(args.limit_agents).copy()
+    agents = balanced_limit_agents(
+        agents,
+        args.limit_agents,
+        seed=int(exp["seed"]),
+    )
 
     model = args.model or exp["model"]
     reasoning_effort = args.reasoning_effort or exp["reasoning_effort"]
@@ -150,7 +149,11 @@ def main() -> None:
     def execute(task):
         agent_dict, stimulus, repeat_id = task
         agent_row = pd.Series(agent_dict)
-        items, qualitative = questionnaire_for_theme(questionnaire, stimulus["theme"])
+        items, qualitative = questionnaire_for_condition(
+            questionnaire,
+            stimulus["theme"],
+            stimulus["condition"],
+        )
 
         if args.mock:
             response = mock_experiment_response(
@@ -271,6 +274,10 @@ def main() -> None:
         "successful_calls": len(wide_records),
         "errors": len(errors),
         "max_workers": max_workers,
+        "profile_counts": {
+            str(k): int(v)
+            for k, v in agents["perfil_credito"].value_counts().sort_index().items()
+        },
     }
     with (run_dir / "metadata.json").open("w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False, indent=2)

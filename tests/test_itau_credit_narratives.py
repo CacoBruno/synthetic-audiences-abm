@@ -3,7 +3,9 @@ import pytest
 
 from synthetic_audiences.experiments.credit_narratives import (
     add_credit_profile_overlays,
+    balanced_limit_agents,
     build_response_schema,
+    questionnaire_for_condition,
     response_to_long_rows,
 )
 
@@ -159,3 +161,77 @@ def test_credit_profile_overlay_refuses_generic_fallback():
 
     with pytest.raises(ValueError, match="endividado_baixa_renda"):
         add_credit_profile_overlays(base, config, n_per_profile=1, seed=42)
+
+
+def test_balanced_limit_agents_selects_one_per_profile():
+    rows = []
+    for profile in ["a", "b", "c", "d", "e", "f", "g"]:
+        for i in range(2):
+            rows.append(
+                {
+                    "id_persona": f"{profile}_{i}",
+                    "perfil_credito": profile,
+                }
+            )
+    df = pd.DataFrame(rows)
+
+    sampled = balanced_limit_agents(df, 7, seed=42)
+
+    counts = sampled["perfil_credito"].value_counts().to_dict()
+    assert len(sampled) == 7
+    assert counts == {profile: 1 for profile in ["a", "b", "c", "d", "e", "f", "g"]}
+
+
+def test_questionnaire_is_condition_aware():
+    questionnaire = {
+        "common_items": [
+            {"id": "ALL", "construct": "all"},
+            {
+                "id": "BRAND",
+                "construct": "brand",
+                "conditions": ["narrative", "context_plus_narrative"],
+            },
+        ],
+        "themes": {
+            "tema": {
+                "items": [
+                    {
+                        "id": "CTX",
+                        "construct": "context",
+                        "conditions": ["context"],
+                    },
+                    {
+                        "id": "MSG",
+                        "construct": "message",
+                        "conditions": ["narrative", "context_plus_narrative"],
+                    },
+                ],
+                "qualitative_by_condition": {
+                    "context": {
+                        "categories": ["contexto"],
+                        "interpretation_prompt": "contexto",
+                        "open_prompt": "contexto",
+                        "critique_prompt": "contexto",
+                    },
+                    "narrative": {
+                        "categories": ["mensagem"],
+                        "interpretation_prompt": "mensagem",
+                        "open_prompt": "mensagem",
+                        "critique_prompt": "mensagem",
+                    },
+                },
+            }
+        },
+    }
+
+    context_items, context_qual = questionnaire_for_condition(
+        questionnaire, "tema", "context"
+    )
+    narrative_items, narrative_qual = questionnaire_for_condition(
+        questionnaire, "tema", "narrative"
+    )
+
+    assert [item["id"] for item in context_items] == ["ALL", "CTX"]
+    assert [item["id"] for item in narrative_items] == ["ALL", "BRAND", "MSG"]
+    assert context_qual["categories"] == ["contexto"]
+    assert narrative_qual["categories"] == ["mensagem"]
