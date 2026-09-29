@@ -29,6 +29,6 @@ jobs:
 
       - name: Smoke test Itaú experiment
         run: |
-          python experiments/itau_credit_narratives/build_agents.py --n-per-profile 2
-          python experiments/itau_credit_narratives/run_experiment.py --mock --limit-agents 4 --repeats 1
+          python experiments/itau_credit_narratives/build_agents.py --n-per-profile 1
+          python experiments/itau_credit_narratives/run_experiment.py --mock --repeats 1
           python experiments/itau_credit_narratives/analyze_results.py
