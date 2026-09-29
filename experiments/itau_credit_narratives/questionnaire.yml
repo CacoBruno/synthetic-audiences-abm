@@ -1,0 +1,200 @@
+common_items:
+  - id: VAL_01
+    construct: Valencia
+    question: "Minha reação geral a esta mensagem é:"
+    scale_min: 1
+    scale_max: 7
+    low_anchor: muito negativa
+    high_anchor: muito positiva
+    direction: positive
+
+  - id: CRE_01
+    construct: Credibilidade
+    question: A mensagem me parece precisa.
+    scale_min: 1
+    scale_max: 7
+    low_anchor: discordo totalmente
+    high_anchor: concordo totalmente
+    direction: positive
+
+  - id: CRE_02
+    construct: Credibilidade
+    question: A mensagem me parece autêntica.
+    scale_min: 1
+    scale_max: 7
+    low_anchor: discordo totalmente
+    high_anchor: concordo totalmente
+    direction: positive
+
+  - id: CRE_03
+    construct: Credibilidade
+    question: A mensagem me parece crível.
+    scale_min: 1
+    scale_max: 7
+    low_anchor: discordo totalmente
+    high_anchor: concordo totalmente
+    direction: positive
+
+  - id: TRU_01
+    construct: Confiança no Itaú
+    question: Esta mensagem aumenta minha confiança no Itaú para tomar decisões de crédito.
+    scale_min: 1
+    scale_max: 7
+    low_anchor: discordo totalmente
+    high_anchor: concordo totalmente
+    direction: positive
+
+  - id: JUS_01
+    construct: Justiça percebida
+    question: A forma de atuação descrita nesta mensagem me parece justa para clientes como eu.
+    scale_min: 1
+    scale_max: 7
+    low_anchor: discordo totalmente
+    high_anchor: concordo totalmente
+    direction: positive
+
+  - id: CLI_01
+    construct: Orientação ao cliente
+    question: A mensagem mostra preocupação genuína com a saúde financeira do cliente.
+    scale_min: 1
+    scale_max: 7
+    low_anchor: discordo totalmente
+    high_anchor: concordo totalmente
+    direction: positive
+
+themes:
+  ia_preco_credito:
+    items:
+      - id: IA_CAP
+        construct: Adequação à capacidade de pagamento
+        question: A mensagem me faz acreditar que o Itaú usa inteligência artificial para oferecer crédito compatível com o que o cliente consegue pagar.
+        scale_min: 1
+        scale_max: 7
+        low_anchor: discordo totalmente
+        high_anchor: concordo totalmente
+        direction: positive
+
+      - id: IA_WTP
+        construct: Exploração por disposição a pagar
+        question: Tenho a impressão de que o banco poderia usar meus dados para cobrar a maior taxa que acredita que eu aceitaria pagar.
+        scale_min: 1
+        scale_max: 7
+        low_anchor: discordo totalmente
+        high_anchor: concordo totalmente
+        direction: negative
+
+      - id: IA_TRA
+        construct: Transparência algorítmica
+        question: A mensagem me deixa confiante de que eu conseguiria entender por que recebi determinada taxa ou limite de crédito.
+        scale_min: 1
+        scale_max: 7
+        low_anchor: discordo totalmente
+        high_anchor: concordo totalmente
+        direction: positive
+
+      - id: IA_DIS
+        construct: Risco de discriminação
+        question: Vejo risco de essa tecnologia tratar alguns clientes de forma injusta ou discriminatória.
+        scale_min: 1
+        scale_max: 7
+        low_anchor: discordo totalmente
+        high_anchor: concordo totalmente
+        direction: negative
+
+      - id: IA_ANT
+        construct: Prevenção do endividamento
+        question: A mensagem me faz acreditar que a tecnologia pode ajudar o banco a agir antes que a dívida se torne um problema maior.
+        scale_min: 1
+        scale_max: 7
+        low_anchor: discordo totalmente
+        high_anchor: concordo totalmente
+        direction: positive
+
+    qualitative:
+      interpretation_prompt: Em uma frase, explique o que você acha que a inteligência artificial do Itaú faz ao decidir uma oferta, limite ou taxa de crédito.
+      open_prompt: Explique brevemente como você interpretou o papel da inteligência artificial nesta mensagem.
+      critique_prompt: Qual seria sua principal dúvida ou crítica sobre esse uso de inteligência artificial?
+      categories:
+        - capacidade_pagamento
+        - risco_credito
+        - disposicao_a_pagar
+        - discriminacao
+        - controle_endividamento
+        - nao_entendeu
+
+  fintech_excesso_oferta:
+    items:
+      - id: FT_RES
+        construct: Crédito responsável
+        question: A mensagem transmite responsabilidade na concessão de crédito.
+        scale_min: 1
+        scale_max: 7
+        low_anchor: discordo totalmente
+        high_anchor: concordo totalmente
+        direction: positive
+
+      - id: FT_LON
+        construct: Orientação de longo prazo
+        question: A mensagem mostra que o banco está preocupado com a situação financeira do cliente no longo prazo.
+        scale_min: 1
+        scale_max: 7
+        low_anchor: discordo totalmente
+        high_anchor: concordo totalmente
+        direction: positive
+
+      - id: FT_PRO
+        construct: Proteção do cliente
+        question: Respeitar a capacidade de pagamento me faz sentir mais protegido como cliente.
+        scale_min: 1
+        scale_max: 7
+        low_anchor: discordo totalmente
+        high_anchor: concordo totalmente
+        direction: positive
+
+      - id: FT_EXC
+        construct: Risco de exclusão
+        question: Essa lógica pode servir como justificativa para negar crédito a quem mais precisa.
+        scale_min: 1
+        scale_max: 7
+        low_anchor: discordo totalmente
+        high_anchor: concordo totalmente
+        direction: negative
+
+      - id: FT_PAT
+        construct: Paternalismo percebido
+        question: A mensagem passa a impressão de que o banco acredita saber melhor do que o cliente quanto ele deve gastar ou tomar emprestado.
+        scale_min: 1
+        scale_max: 7
+        low_anchor: discordo totalmente
+        high_anchor: concordo totalmente
+        direction: negative
+
+      - id: FT_ATQ
+        construct: Ataque percebido a fintechs
+        question: A mensagem parece uma tentativa de criticar bancos digitais para valorizar bancos tradicionais.
+        scale_min: 1
+        scale_max: 7
+        low_anchor: discordo totalmente
+        high_anchor: concordo totalmente
+        direction: negative
+
+      - id: FT_LEG
+        construct: Legitimidade
+        question: Considero legítimo um grande banco defender esse posicionamento sobre concessão responsável de crédito.
+        scale_min: 1
+        scale_max: 7
+        low_anchor: discordo totalmente
+        high_anchor: concordo totalmente
+        direction: positive
+
+    qualitative:
+      interpretation_prompt: Em uma frase, diga qual ideia principal você entende que o Itaú está defendendo sobre concessão de crédito.
+      open_prompt: Explique brevemente como você interpretou a posição do Itaú sobre crédito responsável.
+      critique_prompt: Qual é a principal crítica que você faria a essa posição do Itaú?
+      categories:
+        - credito_responsavel
+        - exclusao
+        - paternalismo
+        - ataque_fintechs
+        - juros_altos
+        - outro

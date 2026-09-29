@@ -1,0 +1,71 @@
+themes:
+  ia_preco_credito:
+    title: IA e o preço do crédito
+    sources:
+      - https://www.hklaw.com/en/insights/publications/2026/04/surveillance-pricing-ai-pricing-tools
+      - https://www.correiobraziliense.com.br/aqui/2026/09/01/como-a-inteligencia-artificial-define-a-taxa-de-juros-do-seu-cartao/
+    stimuli:
+      - id: ia_contexto
+        theme: ia_preco_credito
+        condition: context
+        title: Contexto crítico — IA e personalização do preço
+        content: |
+          O uso de inteligência artificial para definir preços e condições individualizadas vem sendo debatido por reguladores e legisladores.
+          Uma distinção importante é entre preços que variam conforme condições de mercado, preços personalizados com base em características e comportamento do consumidor e precificação de crédito baseada em risco de inadimplência.
+          No crédito, algoritmos podem usar dados financeiros e comportamentais para estimar risco e definir limite ou taxa. Ao mesmo tempo, existe preocupação de que dados pessoais também possam ser usados de forma pouco transparente, discriminatória ou para estimar quanto cada consumidor estaria disposto a pagar.
+
+      - id: ia_narrativa
+        theme: ia_preco_credito
+        condition: narrative
+        title: Narrativa Itaú — IA a serviço da saúde financeira
+        content: |
+          No Itaú, a inteligência artificial é usada para conhecer melhor a realidade financeira de cada cliente e oferecer um crédito que ele consiga pagar. É com ela que ampliamos o acesso ao crédito de forma segura e agimos de forma antecipada para ajudar o cliente ao perceber quando uma dívida começa a pesar. Usamos a tecnologia a serviço da saúde financeira das pessoas.
+
+      - id: ia_contexto_narrativa
+        theme: ia_preco_credito
+        condition: context_plus_narrative
+        title: Contexto crítico + narrativa Itaú
+        content: |
+          CONTEXTO:
+          O uso de inteligência artificial para definir preços e condições individualizadas vem sendo debatido por reguladores e legisladores.
+          Uma distinção importante é entre preços que variam conforme condições de mercado, preços personalizados com base em características e comportamento do consumidor e precificação de crédito baseada em risco de inadimplência.
+          No crédito, algoritmos podem usar dados financeiros e comportamentais para estimar risco e definir limite ou taxa. Ao mesmo tempo, existe preocupação de que dados pessoais também possam ser usados de forma pouco transparente, discriminatória ou para estimar quanto cada consumidor estaria disposto a pagar.
+
+          POSICIONAMENTO DO ITAÚ:
+          No Itaú, a inteligência artificial é usada para conhecer melhor a realidade financeira de cada cliente e oferecer um crédito que ele consiga pagar. É com ela que ampliamos o acesso ao crédito de forma segura e agimos de forma antecipada para ajudar o cliente ao perceber quando uma dívida começa a pesar. Usamos a tecnologia a serviço da saúde financeira das pessoas.
+
+  fintech_excesso_oferta:
+    title: Fintechs e excesso de oferta
+    sources:
+      - https://www.jb.com.br/economia/2026/09/1060945-boom-do-credito-digital-no-brasil-aumenta-endividamento-das-familias.html
+    stimuli:
+      - id: fintech_contexto
+        theme: fintech_excesso_oferta
+        condition: context
+        title: Contexto crítico — expansão do crédito digital
+        content: |
+          Um estudo da Equifax Boa Vista reportou forte crescimento da inadimplência no cartão entre clientes de bancos digitais entre 2021 e 2025, enquanto o indicador ficou mais estável entre bancos tradicionais.
+          O estudo também mostrou que uma parcela relevante dos cartões emitidos por bancos digitais foi o primeiro cartão do cliente.
+          Especialistas discutem se a expansão do crédito digital ampliou inclusão financeira ao mesmo tempo em que facilitou acesso rápido a limites e empréstimos para pessoas com pouco histórico de crédito.
+          Esses dados mostram associação entre expansão do crédito digital e maior inadimplência, mas não demonstram sozinhos que bancos digitais sejam a causa do endividamento das famílias.
+
+      - id: fintech_narrativa
+        theme: fintech_excesso_oferta
+        condition: narrative
+        title: Narrativa Itaú — crédito como relação de longo prazo
+        content: |
+          No Itaú, conceder crédito é o começo de uma relação de longo prazo, e não uma transação. Por isso, oferecemos um crédito que acompanha a vida de cada cliente, que cresce junto com ele, respeita sua capacidade de pagamento e vem com orientação para ser bem usado. É assim que o crédito cumpre seu papel de realizar planos e movimentar a economia, sem se tornar um peso para as famílias.
+
+      - id: fintech_contexto_narrativa
+        theme: fintech_excesso_oferta
+        condition: context_plus_narrative
+        title: Contexto crítico + narrativa Itaú
+        content: |
+          CONTEXTO:
+          Um estudo da Equifax Boa Vista reportou forte crescimento da inadimplência no cartão entre clientes de bancos digitais entre 2021 e 2025, enquanto o indicador ficou mais estável entre bancos tradicionais.
+          O estudo também mostrou que uma parcela relevante dos cartões emitidos por bancos digitais foi o primeiro cartão do cliente.
+          Especialistas discutem se a expansão do crédito digital ampliou inclusão financeira ao mesmo tempo em que facilitou acesso rápido a limites e empréstimos para pessoas com pouco histórico de crédito.
+          Esses dados mostram associação entre expansão do crédito digital e maior inadimplência, mas não demonstram sozinhos que bancos digitais sejam a causa do endividamento das famílias.
+
+          POSICIONAMENTO DO ITAÚ:
+          No Itaú, conceder crédito é o começo de uma relação de longo prazo, e não uma transação. Por isso, oferecemos um crédito que acompanha a vida de cada cliente, que cresce junto com ele, respeita sua capacidade de pagamento e vem com orientação para ser bem usado. É assim que o crédito cumpre seu papel de realizar planos e movimentar a economia, sem se tornar um peso para as famílias.
