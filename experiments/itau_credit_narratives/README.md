@@ -30,10 +30,12 @@ Cada tema tem três condições independentes:
 
 As chamadas são stateless: o mesmo agente pode aparecer nas três condições sem receber memória das exposições anteriores.
 
-Duas métricas de comparação são geradas:
+O desenho passa a separar duas funções:
 
-- **Message Lift** = score(contexto + narrativa) − score(contexto)
-- **Fragility** = score(contexto + narrativa) − score(narrativa)
+- **Context** é diagnóstico do problema e usa perguntas próprias, sem atribuir ao Itaú uma posição que não apareceu no estímulo.
+- **Resiliência da narrativa** = score(contexto + narrativa) − score(narrativa isolada).
+
+Resiliência negativa significa perda de desempenho quando a controvérsia é conhecida; positiva significa manutenção ou ganho. O contexto isolado não entra em um score agregado de "lift" da marca porque o conjunto de perguntas não é o mesmo.
 
 ## Perfis financeiros
 
@@ -97,10 +99,10 @@ experiments/itau_credit_narratives/outputs/agents_itau_credit.csv
 Use primeiro:
 
 ```powershell
-python experiments/itau_credit_narratives/run_experiment.py --mock --repeats 1
+python experiments/itau_credit_narratives/run_experiment.py --mock --limit-agents 7 --repeats 1
 ```
 
-Isso valida schema, persistência e análise sem gastar API.
+Isso valida schema, persistência e análise sem gastar API. O limite de 7 agentes é amostrado de forma balanceada: com os sete perfis existentes, entra 1 agente de cada perfil.
 
 ## 3. Rodar com OpenAI
 
@@ -151,8 +153,9 @@ Principais saídas:
 - `item_summary.csv`
 - `construct_summary.csv`
 - `overall_summary.csv`
-- `message_lift.csv`
-- `construct_lift.csv`
+- `message_resilience.csv`
+- `construct_comparison.csv`
+- `context_diagnostics.csv`
 - `interpretation_shares.csv`
 - `open_responses.csv`
 - `report.md`
