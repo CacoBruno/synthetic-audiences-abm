@@ -67,12 +67,22 @@ def coerce_response(
         )
 
     categories = qualitative["categories"]
-    if out.get("interpretation_category") not in categories:
-        out["interpretation_category"] = categories[-1]
+    primary = out.get("primary_interpretation", out.get("interpretation_category"))
+    if primary not in categories:
+        primary = categories[-1]
+    out["primary_interpretation"] = primary
+
+    residual_categories = qualitative["residual_concern_categories"]
+    residual = out.get("residual_concern")
+    if residual not in residual_categories:
+        residual = residual_categories[-1]
+    out["residual_concern"] = residual
 
     out["interpretation_open"] = str(out.get("interpretation_open", ""))[:2000]
     out["critique_open"] = str(out.get("critique_open", ""))[:2000]
-    out["overall_rationale"] = str(out.get("overall_rationale", ""))[:1200]
+    out["motivation_summary"] = str(
+        out.get("motivation_summary", out.get("overall_rationale", ""))
+    )[:1200]
 
     try:
         confidence = float(out.get("confidence", 0.5))
@@ -205,10 +215,13 @@ def main() -> None:
             "perfil_credito_label": str(agent_row.get("perfil_credito_label", "")),
             "perfil_credito_subtipo": str(agent_row.get("perfil_credito_subtipo", "")),
             **{item["id"]: response[item["id"]] for item in items},
-            "interpretation_category": response["interpretation_category"],
+            "primary_interpretation": response["primary_interpretation"],
+            "interpretation_category": response["primary_interpretation"],
+            "residual_concern": response["residual_concern"],
             "interpretation_open": response["interpretation_open"],
             "critique_open": response["critique_open"],
-            "overall_rationale": response["overall_rationale"],
+            "motivation_summary": response["motivation_summary"],
+            "overall_rationale": response["motivation_summary"],
             "confidence": response["confidence"],
         }
         return wide, long_rows
