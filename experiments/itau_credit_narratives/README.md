@@ -126,7 +126,14 @@ O desenho padrão executa:
 70 agentes × 6 estímulos × 2 repetições = 840 chamadas
 ```
 
-Cada chamada retorna todos os itens quantitativos, a categoria de interpretação, resposta aberta, crítica principal e confiança.
+Cada chamada retorna todos os itens quantitativos e quatro camadas qualitativas complementares:
+
+- `primary_interpretation`: o que a pessoa entendeu como ideia principal;
+- `residual_concern`: a preocupação que permanece mesmo depois de entender a narrativa;
+- `motivation_summary`: descrição curta do principal motivo da reação daquela persona;
+- resposta aberta e crítica principal, além da confiança da classificação.
+
+A motivação é deliberadamente curta e descritiva: serve para explicar o "porquê" observável da reação sem solicitar raciocínio passo a passo.
 
 Você pode rodar apenas um tema:
 
@@ -156,8 +163,10 @@ Principais saídas:
 - `message_resilience.csv`
 - `construct_comparison.csv`
 - `context_diagnostics.csv`
-- `interpretation_shares.csv`
-- `open_responses.csv`
+- `primary_interpretation_shares.csv`
+- `residual_concern_shares.csv`
+- `interpretation_shares.csv` (alias de compatibilidade)
+- `open_responses.csv`, incluindo `motivation_summary`
 - `report.md`
 
 ## Scores
