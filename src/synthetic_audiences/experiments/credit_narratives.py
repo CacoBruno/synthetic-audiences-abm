@@ -272,13 +272,18 @@ def build_response_schema(
         required.append(item_id)
 
     categories = qualitative["categories"]
-    properties["interpretation_category"] = {
+    residual_categories = qualitative["residual_concern_categories"]
+    properties["primary_interpretation"] = {
         "type": "string",
         "enum": categories,
     }
+    properties["residual_concern"] = {
+        "type": "string",
+        "enum": residual_categories,
+    }
     properties["interpretation_open"] = {"type": "string", "minLength": 1}
     properties["critique_open"] = {"type": "string", "minLength": 1}
-    properties["overall_rationale"] = {"type": "string", "minLength": 1}
+    properties["motivation_summary"] = {"type": "string", "minLength": 1}
     properties["confidence"] = {
         "type": "number",
         "minimum": 0,
@@ -286,10 +291,11 @@ def build_response_schema(
     }
     required.extend(
         [
-            "interpretation_category",
+            "primary_interpretation",
+            "residual_concern",
             "interpretation_open",
             "critique_open",
-            "overall_rationale",
+            "motivation_summary",
             "confidence",
         ]
     )
@@ -318,6 +324,7 @@ def build_experiment_messages(
         )
 
     categories = ", ".join(qualitative["categories"])
+    residual_categories = ", ".join(qualitative["residual_concern_categories"])
     human = f"""CONTEXTO DO RESPONDENTE
 {build_base_agent_context(agent_row)}
 
@@ -336,14 +343,23 @@ Use apenas números inteiros de 1 a 7 nos itens quantitativos.
 {chr(10).join(item_text)}
 
 INTERPRETAÇÃO QUALITATIVA
+Interpretação principal:
 {qualitative['interpretation_prompt']}
 Escolha exatamente uma categoria entre: {categories}
+
+Preocupação residual:
+{qualitative['residual_concern_prompt']}
+Escolha exatamente uma categoria entre: {residual_categories}
 
 Resposta aberta:
 {qualitative['open_prompt']}
 
 Crítica principal:
 {qualitative['critique_prompt']}
+
+Motivação da resposta:
+{qualitative['motivation_prompt']}
+Responda em uma ou duas frases, descrevendo o principal motivo da reação desta pessoa, sem expor raciocínio passo a passo.
 
 Retorne apenas o JSON definido pelo schema.
 """.strip()
@@ -358,7 +374,7 @@ Regras:
 4. Não tente agradar a marca nem o pesquisador.
 5. Diferencie confiança, justiça, transparência, risco e interesse comercial.
 6. Não exponha raciocínio passo a passo.
-7. A justificativa geral deve ter no máximo duas frases.
+7. A motivação deve descrever de forma curta o principal motivo observável da resposta, sem raciocínio passo a passo.
 8. Retorne somente JSON válido.
 """.strip()
 
@@ -390,14 +406,22 @@ def mock_experiment_response(
     idx = min(int(ucat * len(categories)), len(categories) - 1)
     category = categories[idx]
 
-    result["interpretation_category"] = category
+    residual_categories = qualitative["residual_concern_categories"]
+    ures = stable_float_0_1(agent_id, stimulus["id"], "residual_concern", iteration)
+    residual_idx = min(int(ures * len(residual_categories)), len(residual_categories) - 1)
+    residual_concern = residual_categories[residual_idx]
+
+    result["primary_interpretation"] = category
+    result["residual_concern"] = residual_concern
     result["interpretation_open"] = (
         f"Resposta mock: interpretação classificada como {category}."
     )
     result["critique_open"] = (
         "Resposta mock para validar persistência, agregação e leitura qualitativa."
     )
-    result["overall_rationale"] = "Resposta mock determinística; não possui validade analítica."
+    result["motivation_summary"] = (
+        "Resposta mock determinística para validar o campo de motivação; não possui validade analítica."
+    )
     result["confidence"] = round(
         0.55 + stable_float_0_1(agent_id, stimulus["id"], iteration) * 0.3,
         3,
@@ -464,10 +488,25 @@ def response_to_long_rows(
                 "score_raw": score,
                 "score_favorable": favorable,
                 "confidence": float(response.get("confidence", 0.5)),
-                "interpretation_category": response.get("interpretation_category", ""),
+                "primary_interpretation": response.get(
+                    "primary_interpretation",
+                    response.get("interpretation_category", ""),
+                ),
+                "interpretation_category": response.get(
+                    "primary_interpretation",
+                    response.get("interpretation_category", ""),
+                ),
+                "residual_concern": response.get("residual_concern", ""),
                 "interpretation_open": response.get("interpretation_open", ""),
                 "critique_open": response.get("critique_open", ""),
-                "overall_rationale": response.get("overall_rationale", ""),
+                "motivation_summary": response.get(
+                    "motivation_summary",
+                    response.get("overall_rationale", ""),
+                ),
+                "overall_rationale": response.get(
+                    "motivation_summary",
+                    response.get("overall_rationale", ""),
+                ),
             }
         )
 
