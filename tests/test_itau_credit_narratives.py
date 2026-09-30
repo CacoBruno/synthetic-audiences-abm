@@ -68,6 +68,7 @@ def test_response_schema_requires_every_item_and_qualitative_fields():
     ]
     qualitative = {
         "categories": ["a", "b"],
+        "residual_concern_categories": ["none", "risk"],
     }
 
     schema = build_response_schema(items, qualitative)
@@ -75,7 +76,9 @@ def test_response_schema_requires_every_item_and_qualitative_fields():
     assert schema["properties"]["Q1"]["minimum"] == 1
     assert schema["properties"]["Q1"]["maximum"] == 7
     assert set(["Q1", "Q2"]).issubset(schema["required"])
-    assert schema["properties"]["interpretation_category"]["enum"] == ["a", "b"]
+    assert schema["properties"]["primary_interpretation"]["enum"] == ["a", "b"]
+    assert schema["properties"]["residual_concern"]["enum"] == ["none", "risk"]
+    assert "motivation_summary" in schema["required"]
 
 
 def test_negative_items_are_reversed_only_in_favorable_score():
@@ -107,10 +110,11 @@ def test_negative_items_are_reversed_only_in_favorable_score():
         "POS": 6,
         "NEG": 6,
         "confidence": 0.8,
-        "interpretation_category": "x",
+        "primary_interpretation": "x",
+        "residual_concern": "none",
         "interpretation_open": "x",
         "critique_open": "x",
-        "overall_rationale": "x",
+        "motivation_summary": "porque x",
     }
 
     rows = response_to_long_rows(
@@ -235,3 +239,41 @@ def test_questionnaire_is_condition_aware():
     assert [item["id"] for item in narrative_items] == ["ALL", "BRAND", "MSG"]
     assert context_qual["categories"] == ["contexto"]
     assert narrative_qual["categories"] == ["mensagem"]
+
+
+def test_long_rows_persist_qualitative_explanation_fields():
+    agent = pd.Series(
+        {
+            "id_persona": "agent_test",
+            "perfil_credito": "teste",
+            "perfil_credito_label": "Teste",
+        }
+    )
+    stimulus = {"id": "stim_1", "theme": "tema", "condition": "narrative"}
+    items = [{"id": "Q1", "construct": "Teste", "direction": "positive"}]
+    response = {
+        "Q1": 5,
+        "confidence": 0.8,
+        "primary_interpretation": "capacidade_pagamento",
+        "residual_concern": "falta_transparencia",
+        "interpretation_open": "Entendi a proposta.",
+        "critique_open": "Ainda faltam detalhes.",
+        "motivation_summary": "A proposta parece útil, mas quero saber como a decisão é tomada.",
+    }
+
+    rows = response_to_long_rows(
+        agent,
+        stimulus,
+        items,
+        response,
+        run_id="run",
+        model="mock",
+        iteration=0,
+        is_mock=True,
+    )
+
+    row = rows[0]
+    assert row["primary_interpretation"] == "capacidade_pagamento"
+    assert row["interpretation_category"] == "capacidade_pagamento"
+    assert row["residual_concern"] == "falta_transparencia"
+    assert "como a decisão" in row["motivation_summary"]
