@@ -24,6 +24,16 @@ def resolve_run_dir(requested: Path | None) -> Path:
 
 
 def compute_tables(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
+    df = df.copy()
+    if "primary_interpretation" not in df.columns:
+        df["primary_interpretation"] = df.get("interpretation_category", "")
+    if "interpretation_category" not in df.columns:
+        df["interpretation_category"] = df["primary_interpretation"]
+    if "residual_concern" not in df.columns:
+        df["residual_concern"] = "nao_coletado"
+    if "motivation_summary" not in df.columns:
+        df["motivation_summary"] = df.get("overall_rationale", "")
+
     call_keys = [
         "run_id",
         "id_persona",
@@ -136,36 +146,72 @@ def compute_tables(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
         ]
     ).copy()
 
-    interpretation_shares = (
+    primary_interpretation_shares = (
         qualitative.groupby(
             [
                 "theme",
                 "condition",
                 "perfil_credito",
                 "perfil_credito_label",
-                "interpretation_category",
+                "primary_interpretation",
             ],
             as_index=False,
         )
         .size()
         .rename(columns={"size": "n"})
     )
-    totals = (
-        interpretation_shares.groupby(
+    primary_totals = (
+        primary_interpretation_shares.groupby(
             ["theme", "condition", "perfil_credito"],
             as_index=False,
         )["n"]
         .sum()
         .rename(columns={"n": "total"})
     )
-    interpretation_shares = interpretation_shares.merge(
-        totals,
+    primary_interpretation_shares = primary_interpretation_shares.merge(
+        primary_totals,
         on=["theme", "condition", "perfil_credito"],
         how="left",
     )
-    interpretation_shares["share"] = (
-        interpretation_shares["n"] / interpretation_shares["total"]
+    primary_interpretation_shares["share"] = (
+        primary_interpretation_shares["n"] / primary_interpretation_shares["total"]
     )
+
+    residual_concern_shares = (
+        qualitative.groupby(
+            [
+                "theme",
+                "condition",
+                "perfil_credito",
+                "perfil_credito_label",
+                "residual_concern",
+            ],
+            as_index=False,
+        )
+        .size()
+        .rename(columns={"size": "n"})
+    )
+    residual_totals = (
+        residual_concern_shares.groupby(
+            ["theme", "condition", "perfil_credito"],
+            as_index=False,
+        )["n"]
+        .sum()
+        .rename(columns={"n": "total"})
+    )
+    residual_concern_shares = residual_concern_shares.merge(
+        residual_totals,
+        on=["theme", "condition", "perfil_credito"],
+        how="left",
+    )
+    residual_concern_shares["share"] = (
+        residual_concern_shares["n"] / residual_concern_shares["total"]
+    )
+
+    # Backward-compatible alias for notebooks built against the previous output.
+    interpretation_shares = primary_interpretation_shares.rename(
+        columns={"primary_interpretation": "interpretation_category"}
+    ).copy()
 
     open_responses = qualitative[
         [
@@ -175,9 +221,12 @@ def compute_tables(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
             "perfil_credito_label",
             "perfil_credito_subtipo",
             "id_persona",
+            "primary_interpretation",
             "interpretation_category",
+            "residual_concern",
             "interpretation_open",
             "critique_open",
+            "motivation_summary",
             "overall_rationale",
             "confidence",
         ]
@@ -211,6 +260,8 @@ def compute_tables(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
         "message_resilience": message_resilience,
         "construct_comparison": construct_comparison,
         "context_diagnostics": context_diagnostics,
+        "primary_interpretation_shares": primary_interpretation_shares,
+        "residual_concern_shares": residual_concern_shares,
         "interpretation_shares": interpretation_shares,
         "open_responses": open_responses,
     }
@@ -218,7 +269,8 @@ def compute_tables(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
 
 def render_report(tables: dict[str, pd.DataFrame], is_mock: bool) -> str:
     resilience = tables["message_resilience"].copy()
-    shares = tables["interpretation_shares"].copy()
+    shares = tables["primary_interpretation_shares"].copy()
+    residual = tables["residual_concern_shares"].copy()
 
     lines = ["# Itaú — Teste de narrativas com audiências sintéticas", ""]
     if is_mock:
@@ -289,7 +341,36 @@ def render_report(tables: dict[str, pd.DataFrame], is_mock: bool) -> str:
                 top[
                     [
                         "perfil_credito_label",
-                        "interpretation_category",
+                        "primary_interpretation",
+                        "share",
+                    ]
+                ]
+                .rename(columns={"primary_interpretation": "interpretation_category", "share": "share_%"})
+                .to_markdown(index=False)
+            )
+            lines.append("")
+
+        residual_selected = residual[
+            (residual["theme"] == theme)
+            & (residual["condition"] == "context_plus_narrative")
+        ].copy()
+        if not residual_selected.empty:
+            residual_top = (
+                residual_selected.sort_values(
+                    ["perfil_credito_label", "share"],
+                    ascending=[True, False],
+                )
+                .groupby("perfil_credito_label", as_index=False)
+                .head(1)
+            )
+            residual_top["share"] = (residual_top["share"] * 100).round(1)
+            lines.append("### Preocupação residual predominante após contexto + narrativa")
+            lines.append("")
+            lines.append(
+                residual_top[
+                    [
+                        "perfil_credito_label",
+                        "residual_concern",
                         "share",
                     ]
                 ]
