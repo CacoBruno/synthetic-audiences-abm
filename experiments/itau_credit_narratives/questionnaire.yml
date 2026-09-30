@@ -120,6 +120,18 @@ themes:
         interpretation_prompt: Em uma frase, explique qual uso ou risco de inteligência artificial no crédito ficou mais saliente no contexto apresentado.
         open_prompt: Explique brevemente como você interpretou o debate sobre uso de dados, taxas e limites de crédito.
         critique_prompt: Qual é sua principal preocupação ou dúvida diante desse contexto?
+        residual_concern_prompt: Mesmo após formar sua interpretação principal, qual preocupação permanece mais importante para você?
+        motivation_prompt: Explique o principal motivo da sua reação ao contexto, considerando sua situação financeira e o que foi apresentado.
+        residual_concern_categories:
+          - nenhuma
+          - falta_transparencia
+          - disposicao_a_pagar
+          - discriminacao
+          - uso_dados
+          - impossibilidade_contestar
+          - interesse_comercial
+          - exclusao_credito
+          - outro
         categories:
           - risco_credito
           - disposicao_a_pagar
@@ -132,6 +144,18 @@ themes:
         interpretation_prompt: Em uma frase, explique o que você acha que a inteligência artificial do Itaú faz ao decidir uma oferta, limite ou taxa de crédito.
         open_prompt: Explique brevemente como você interpretou o papel da inteligência artificial nesta mensagem do Itaú.
         critique_prompt: Qual seria sua principal dúvida ou crítica sobre esse uso de inteligência artificial pelo Itaú?
+        residual_concern_prompt: Depois de entender a proposta do Itaú, qual preocupação ainda permanece mais importante para você?
+        motivation_prompt: Explique por que essa mensagem aumenta, mantém ou reduz sua confiança no uso de inteligência artificial pelo Itaú, considerando seu perfil.
+        residual_concern_categories:
+          - nenhuma
+          - falta_transparencia
+          - disposicao_a_pagar
+          - discriminacao
+          - uso_dados
+          - impossibilidade_contestar
+          - interesse_comercial
+          - exclusao_credito
+          - outro
         categories:
           - capacidade_pagamento
           - risco_credito
@@ -144,6 +168,18 @@ themes:
         interpretation_prompt: Depois de conhecer o debate e a posição do Itaú, em uma frase explique qual papel você acha que a inteligência artificial do Itaú desempenha na concessão de crédito.
         open_prompt: Explique brevemente se o posicionamento do Itaú muda ou não sua interpretação do risco apresentado no contexto.
         critique_prompt: Depois de ler o contexto e a resposta do Itaú, qual dúvida ou crítica permanece?
+        residual_concern_prompt: Depois de conhecer a controvérsia e a resposta do Itaú, qual preocupação residual continua mais importante?
+        motivation_prompt: Explique por que a resposta do Itaú foi ou não suficiente para mudar sua percepção inicial, considerando seu perfil.
+        residual_concern_categories:
+          - nenhuma
+          - falta_transparencia
+          - disposicao_a_pagar
+          - discriminacao
+          - uso_dados
+          - impossibilidade_contestar
+          - interesse_comercial
+          - exclusao_credito
+          - outro
         categories:
           - capacidade_pagamento
           - risco_credito
@@ -259,6 +295,18 @@ themes:
         interpretation_prompt: Em uma frase, diga qual problema ou oportunidade do crédito digital aparece como principal no contexto apresentado.
         open_prompt: Explique brevemente como você interpreta a relação entre expansão do crédito digital, inclusão financeira e inadimplência.
         critique_prompt: Qual informação adicional você precisaria para formar uma opinião mais segura sobre esse contexto?
+        residual_concern_prompt: Qual preocupação permanece mais importante depois de considerar inclusão financeira e risco de inadimplência?
+        motivation_prompt: Explique o principal motivo da sua reação ao contexto sobre crédito digital, considerando sua situação financeira.
+        residual_concern_categories:
+          - nenhuma
+          - exclusao
+          - paternalismo
+          - ataque_fintechs
+          - juros_altos
+          - promessa_sem_evidencia
+          - falta_transparencia
+          - causalidade_incerta
+          - outro
         categories:
           - inclusao_financeira
           - excesso_oferta
@@ -271,6 +319,18 @@ themes:
         interpretation_prompt: Em uma frase, diga qual ideia principal você entende que o Itaú está defendendo sobre concessão de crédito.
         open_prompt: Explique brevemente como você interpretou a posição do Itaú sobre crédito responsável.
         critique_prompt: Qual é a principal crítica que você faria a essa posição do Itaú?
+        residual_concern_prompt: Depois de entender a proposta de crédito responsável do Itaú, qual preocupação ainda permanece mais importante?
+        motivation_prompt: Explique por que essa posição do Itaú aumenta, mantém ou reduz sua confiança no banco, considerando seu perfil.
+        residual_concern_categories:
+          - nenhuma
+          - exclusao
+          - paternalismo
+          - ataque_fintechs
+          - juros_altos
+          - promessa_sem_evidencia
+          - falta_transparencia
+          - causalidade_incerta
+          - outro
         categories:
           - credito_responsavel
           - exclusao
@@ -283,6 +343,18 @@ themes:
         interpretation_prompt: Depois de conhecer o contexto do crédito digital e a posição do Itaú, em uma frase diga qual ideia principal você entende que o banco está defendendo.
         open_prompt: Explique brevemente se o contexto sobre bancos digitais muda ou não sua leitura da narrativa do Itaú.
         critique_prompt: Depois de ler o contexto e a resposta do Itaú, qual é a principal crítica que permanece?
+        residual_concern_prompt: Depois de conhecer o contexto das fintechs e a resposta do Itaú, qual preocupação residual continua mais importante?
+        motivation_prompt: Explique por que o posicionamento do Itaú foi ou não suficiente para mudar sua percepção do problema, considerando seu perfil.
+        residual_concern_categories:
+          - nenhuma
+          - exclusao
+          - paternalismo
+          - ataque_fintechs
+          - juros_altos
+          - promessa_sem_evidencia
+          - falta_transparencia
+          - causalidade_incerta
+          - outro
         categories:
           - credito_responsavel
           - exclusao
